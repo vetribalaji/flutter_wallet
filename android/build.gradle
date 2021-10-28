@@ -27,4 +27,12 @@ android {
     defaultConfig {
         minSdkVersion 16
     }
+
+    dependencies{
+        implementation fileTree(dir: 'libs', include: ['*.aar'])
+    }
+}
+
+dependencies {
+    implementation 'org.jetbrains:annotations-java5:15.0'
 }
