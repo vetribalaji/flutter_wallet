@@ -33,7 +33,3 @@ android {
         implementation 'com.google.android.gms:play-services-base:17.2.1'
     }
 }
-
-dependencies {
-    implementation 'org.jetbrains:annotations-java5:15.0'
-}
