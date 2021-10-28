@@ -4,6 +4,7 @@ import 'package:add_to_wallet/add_to_wallet.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_wallet/flutter_wallet.dart';
 import 'package:uuid/uuid.dart';
 
 class PKAddPaymentPassRequest {
@@ -81,12 +82,7 @@ class _AddToWalletButtonState extends State<AddToWalletButton> {
           creationParamsCodec: const StandardMessageCodec(),
         );
       case TargetPlatform.android:
-        return AndroidView(
-          viewType: AddToWalletButton.viewType,
-          layoutDirection: Directionality.of(context),
-          creationParams: androidViewCreationParams,
-          creationParamsCodec: const StandardMessageCodec(),
-        );
+        return ElevatedButton(onPressed: () async => await FlutterWallet.addCardToGooglePay(), child: Text("Add to Google Pay"));
       default:
         if (widget.unsupportedPlatformChild == null) throw UnsupportedError('Unsupported platform view');
         return widget.unsupportedPlatformChild!;

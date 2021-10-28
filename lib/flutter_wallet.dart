@@ -1,14 +1,16 @@
-
 import 'dart:async';
 
 import 'package:flutter/services.dart';
 
 class FlutterWallet {
-  static const MethodChannel _channel =
-      const MethodChannel('flutter_wallet');
+  static const MethodChannel _channel = const MethodChannel('flutter_wallet');
 
   static Future<String?> get platformVersion async {
     final String? version = await _channel.invokeMethod('getPlatformVersion');
     return version;
+  }
+
+  static Future<void> addCardToGooglePay() async {
+    await _channel.invokeMethod('addCardToGooglePay');
   }
 }
