@@ -1,14 +1,119 @@
 import Flutter
 import UIKit
+import PassKit
+
+class PKAddPassButtonNativeViewFactory: NSObject, FlutterPlatformViewFactory {
+    private var messenger: FlutterBinaryMessenger
+    private var channel: FlutterMethodChannel
+
+    init(messenger: FlutterBinaryMessenger, channel: FlutterMethodChannel) {
+        self.messenger = messenger
+        self.channel = channel
+        super.init()
+    }
+
+    func create(
+        withFrame frame: CGRect,
+        viewIdentifier viewId: Int64,
+        arguments args: Any?
+    ) -> FlutterPlatformView {
+        return PKAddPassButtonNativeView(
+            frame: frame,
+            viewIdentifier: viewId,
+            arguments: args as! [String: Any],
+            binaryMessenger: messenger,
+            channel: channel)
+    }
+    public func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
+          return FlutterStandardMessageCodec.sharedInstance()
+    }
+}
+
+class PKAddPassButtonNativeView: NSObject, FlutterPlatformView, PKAddPaymentPassViewControllerDelegate {
+    private var _view: UIView
+    private var _key: String
+    private var _width: CGFloat
+    private var _height: CGFloat
+    private var _channel: FlutterMethodChannel
+
+    init(
+        frame: CGRect,
+        viewIdentifier viewId: Int64,
+        arguments args: [String: Any],
+        binaryMessenger messenger: FlutterBinaryMessenger?,
+        channel: FlutterMethodChannel
+    ) {
+        _view = UIView()
+        _key = args["key"] as! String
+        _width = args["width"] as? CGFloat ?? 140
+        _height = args["height"] as? CGFloat ?? 30
+        _channel = channel
+        super.init()
+        createAddPassButton()
+    }
+
+    func view() -> UIView {
+        _view
+    }
+
+    func createAddPassButton() {
+        let passButton = PKAddPassButton(addPassButtonStyle: PKAddPassButtonStyle.black)
+        passButton.frame = CGRect(x: 0, y: 0, width: _width, height: _height)
+        passButton.addTarget(self, action: #selector(passButtonAction), for: .touchUpInside)
+        _view.addSubview(passButton)
+    }
+
+    func addPaymentPassViewController(_ controller: PKAddPaymentPassViewController, generateRequestWithCertificateChain certificates: [Data], nonce: Data, nonceSignature: Data, completionHandler handler: @escaping (PKAddPaymentPassRequest) -> Void) {
+        let map: [String: Any?] = ["certificates": certificates, "nonce": nonce, "nonceSignature": nonceSignature]
+        _channel.invokeMethod("onApplePayDataReceived", arguments: map, result: { result in
+            let paymentPassRequest = PKAddPaymentPassRequest.init()
+            guard let resultMap = result as? [String: String?] else {
+                return
+            }
+            paymentPassRequest.encryptedPassData = resultMap["encryptedPassData"]??.data(using: String.Encoding.utf8)
+            paymentPassRequest.activationData = resultMap["activationData"]??.data(using: String.Encoding.utf8)
+            paymentPassRequest.ephemeralPublicKey = resultMap["ephemeralPublicKey"]??.data(using: String.Encoding.utf8)
+            handler(paymentPassRequest)
+        })
+    }
+
+    func addPaymentPassViewController(_ controller: PKAddPaymentPassViewController, didFinishAdding pass: PKPaymentPass?, error: Error?) {
+        _channel.invokeMethod("onApplePayFinished", arguments: error?.localizedDescription)
+    }
+
+    @objc func passButtonAction() {
+        guard let config = PKAddPaymentPassRequestConfiguration.init(encryptionScheme: PKEncryptionScheme.ECC_V2) else {
+            print("PKAddPaymentPassRequestConfiguration is null")
+            return
+        }
+
+        guard let controller = PKAddPaymentPassViewController(requestConfiguration: config, delegate: self) else {
+            print("PKAddPaymentPassViewController is null")
+            return
+        }
+
+        guard let rootVC = UIApplication.shared.keyWindow?.rootViewController else {
+            print("Root VC unavailable")
+            return
+        }
+
+        rootVC.present(controller, animated: true)
+        //_invokeAddButtonPressed()
+    }
+}
 
 public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "flutter_wallet", binaryMessenger: registrar.messenger())
+
+    let factory = PKAddPassButtonNativeViewFactory(messenger: registrar.messenger(), channel: channel)
+    registrar.register(factory, withId: "PKAddPassButton")
+
     let instance = SwiftFlutterWalletPlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    result("iOS " + UIDevice.current.systemVersion)
+    return result(FlutterMethodNotImplemented)
   }
 }

@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:add_to_wallet/add_to_wallet.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_wallet/add_to_wallet.dart';
 import 'package:uuid/uuid.dart';
 
 class PKAddPaymentPassRequest {
@@ -21,7 +21,7 @@ class AddToWalletButton extends StatefulWidget {
   final double height;
   final Widget? unsupportedPlatformChild;
   final FutureOr<PKAddPaymentPassRequest> Function(List<String> certificates, String nonce, String nonceSignature) onData;
-  final FutureOr<void> Function(String? error) onDone;
+  final Function(String? error) onDone;
   final String _id = Uuid().v4();
 
   AddToWalletButton(
@@ -47,13 +47,24 @@ class _AddToWalletButtonState extends State<AddToWalletButton> {
   @override
   void initState() {
     super.initState();
-   // AddToWallet().addHandler(widget._id, (_) => widget.onPressed?.call());
+    AddToWallet().addHandler(widget._id, _onMethodCall);
   }
 
-  @override
-  void dispose() {
-    //AddToWallet().removeHandler(widget._id);
-    super.dispose();
+  Future<dynamic> _onMethodCall(MethodCall call) async {
+    switch (call.method) {
+      case "onApplePayDataReceived":
+        final List<String> certificates = call.arguments["certificates"];
+        final String nonce = call.arguments["nonce"];
+        final String nonceSignature = call.arguments["nonceSignature"];
+
+        final response = await widget.onData(certificates, nonce, nonceSignature);
+        return {"activationData": response.activationData, "encryptedPassData": response.encryptedPassData, "ephemeralPublicKey": response.ephemeralPublicKey};
+      case "onApplePayFinished":
+        widget.onDone(call.arguments == null ? null : call.arguments as String);
+        break;
+      default:
+        return null;
+    }
   }
 
   @override
@@ -78,5 +89,11 @@ class _AddToWalletButtonState extends State<AddToWalletButton> {
         if (widget.unsupportedPlatformChild == null) throw UnsupportedError('Unsupported platform view');
         return widget.unsupportedPlatformChild!;
     }
+  }
+
+  @override
+  void dispose() {
+    AddToWallet().removeHandler(widget._id);
+    super.dispose();
   }
 }
