@@ -16,6 +16,7 @@ rootProject.allprojects {
     repositories {
         google()
         jcenter()
+        mavenLocal()
     }
 }
 
@@ -29,7 +30,8 @@ android {
     }
 
     dependencies{
-        implementation fileTree(dir: 'libs', include: ['*.aar'])
+        //implementation fileTree(dir: 'libs', include: ['*.aar'])
+        implementation 'com.google.android.gms:play-services-tapandpay:17.1.2'
         implementation 'com.google.android.gms:play-services-base:17.2.1'
     }
 }
