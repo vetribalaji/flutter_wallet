@@ -2,8 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_wallet/add_to_wallet.dart';
+import 'package:flutter/services.dart';import 'package:flutter_wallet/add_to_wallet.dart';
 import 'package:uuid/uuid.dart';
 
 class PKAddPaymentPassRequest {
@@ -24,14 +23,14 @@ class AddToWalletButton extends StatefulWidget {
   final Function(String? error) onDone;
   final String _id = Uuid().v4();
 
-  AddToWalletButton(
-      {Key? key,
-        required this.width,
-        required this.height,
-        required this.onData,
-        required this.onDone,
-        this.unsupportedPlatformChild, })
-      : super(key: key);
+  AddToWalletButton({
+    Key? key,
+    required this.width,
+    required this.height,
+    required this.onData,
+    required this.onDone,
+    this.unsupportedPlatformChild,
+  }) : super(key: key);
 
   @override
   _AddToWalletButtonState createState() => _AddToWalletButtonState();
@@ -39,10 +38,16 @@ class AddToWalletButton extends StatefulWidget {
 
 class _AddToWalletButtonState extends State<AddToWalletButton> {
   get uiKitCreationParams => {
-    'width': widget.width,
-    'height': widget.height,
-    'key': widget._id,
-  };
+        'width': widget.width,
+        'height': widget.height,
+        'key': widget._id,
+      };
+
+  get androidViewCreationParams => {
+        'width': widget.width,
+        'height': widget.height,
+        'key': widget._id,
+      };
 
   @override
   void initState() {
@@ -85,10 +90,16 @@ class _AddToWalletButtonState extends State<AddToWalletButton> {
           creationParams: uiKitCreationParams,
           creationParamsCodec: const StandardMessageCodec(),
         );
+      case TargetPlatform.android:
+        return ElevatedButton(onPressed: () async => await addCardToGooglePay(), child: Text("Add to Google Pay"));
       default:
         if (widget.unsupportedPlatformChild == null) throw UnsupportedError('Unsupported platform view');
         return widget.unsupportedPlatformChild!;
     }
+  }
+
+  Future addCardToGooglePay() {
+    
   }
 
   @override

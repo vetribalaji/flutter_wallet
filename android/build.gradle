@@ -27,4 +27,9 @@ android {
     defaultConfig {
         minSdkVersion 16
     }
+
+    dependencies{
+        implementation fileTree(dir: 'libs', include: ['*.aar'])
+        implementation 'com.google.android.gms:play-services-base:17.2.1'
+    }
 }
