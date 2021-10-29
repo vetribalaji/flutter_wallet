@@ -50,7 +50,7 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler,Act
                       .setPhoneNumber("asd")
                       .build();
 
-      PushTokenizeRequest pushTokenizeRequest =
+     /* PushTokenizeRequest pushTokenizeRequest =
               new PushTokenizeRequest.Builder()
                       .setOpaquePaymentCard("1234".getBytes())
                       .setNetwork(TapAndPay.CARD_NETWORK_VISA)
@@ -58,9 +58,17 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler,Act
                       .setDisplayName("Test Card")
                       .setLastDigits("1234")
                       .setUserAddress(userAddress)
-                      .build();
+                      .build();*/
 
-      tapAndPayClient.pushTokenize(activity, pushTokenizeRequest, REQUEST_CODE_PUSH_TOKENIZE);
+      tapAndPayClient.tokenize(
+              activity,
+              null, // optional issuerTokenId, used to resume a previous activation attempt,
+              TapAndPay.TOKEN_PROVIDER_VISA,
+              "Test",
+              TapAndPay.CARD_NETWORK_VISA,
+              1);
+
+      //tapAndPayClient.pushTokenize(activity, pushTokenizeRequest, REQUEST_CODE_PUSH_TOKENIZE);
 
     } else {
       result.notImplemented();
