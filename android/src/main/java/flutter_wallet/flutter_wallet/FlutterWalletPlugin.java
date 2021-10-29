@@ -8,6 +8,7 @@ import com.google.android.gms.tapandpay.TapAndPay;
 import com.google.android.gms.tapandpay.TapAndPayClient;
 import com.google.android.gms.tapandpay.issuer.PushTokenizeRequest;
 import com.google.android.gms.tapandpay.issuer.UserAddress;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.nio.charset.StandardCharsets;
 
@@ -35,14 +36,19 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler,Act
   }
 
   @Override
-  public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+  public void onMethodCall(@NonNull MethodCall call, @NonNull final Result result) {
     switch (call.method) {
       case "getPlatformVersion":
         result.success("Android " + android.os.Build.VERSION.RELEASE);
         break;
       case "getGooglePayWalletId":
-        String walletId = tapAndPayClient.getActiveWalletId().getResult();
-        result.success(walletId);
+        tapAndPayClient.getActiveWalletId().addOnSuccessListener(new OnSuccessListener<String>() {
+          @Override
+          public void onSuccess(String walletId) {
+            result.success(walletId);
+          }
+        });
+
         //tapAndPayClient.pushTokenize(activity, pushTokenizeRequest, REQUEST_CODE_PUSH_TOKENIZE);
         break;
       case "addCardToGooglePay":
