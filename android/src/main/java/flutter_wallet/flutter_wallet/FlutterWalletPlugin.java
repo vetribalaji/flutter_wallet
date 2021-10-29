@@ -52,8 +52,7 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler,Act
               result.success(task.getResult());
             } else {
               String message = task.getException().getLocalizedMessage();
-              StackTraceElement[] details = task.getException().getStackTrace();
-              result.error("0",message,details);
+              result.error("0",message,null);
             }
           }
         });

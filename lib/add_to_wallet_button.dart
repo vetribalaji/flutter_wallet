@@ -120,7 +120,7 @@ class _AddToWalletButtonState extends State<AddToWalletButton> {
         );
       case TargetPlatform.android:
         return widget.androidButton != null
-            ? Container(child: InkWell(onTap: _handleAddCardToGooglePay, child: widget.androidButton))
+            ? Container(child: Material(color: Colors.transparent, child: InkWell(onTap: _handleAddCardToGooglePay, child: widget.androidButton)))
             : ElevatedButton(onPressed: _handleAddCardToGooglePay, child: Text("Add to Google Pay"));
       default:
         if (widget.unsupportedPlatformChild == null) throw UnsupportedError('Unsupported platform view');
