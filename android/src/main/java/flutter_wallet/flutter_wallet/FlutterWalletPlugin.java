@@ -8,9 +8,12 @@ import com.google.android.gms.tapandpay.TapAndPay;
 import com.google.android.gms.tapandpay.TapAndPayClient;
 import com.google.android.gms.tapandpay.issuer.PushTokenizeRequest;
 import com.google.android.gms.tapandpay.issuer.UserAddress;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -42,16 +45,48 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler,Act
         result.success("Android " + android.os.Build.VERSION.RELEASE);
         break;
       case "getGooglePayWalletId":
-        tapAndPayClient.getActiveWalletId().addOnSuccessListener(new OnSuccessListener<String>() {
+        tapAndPayClient.getActiveWalletId().addOnCompleteListener(new OnCompleteListener<String>() {
           @Override
-          public void onSuccess(String walletId) {
-            result.success(walletId);
+          public void onComplete(@NonNull Task<String> task) {
+            if (task.isSuccessful()) {
+              result.success(task.getResult());
+            } else {
+              String message = task.getException().getLocalizedMessage();
+              StackTraceElement[] details = task.getException().getStackTrace();
+              result.error("0",message,details);
+            }
           }
         });
-
-        //tapAndPayClient.pushTokenize(activity, pushTokenizeRequest, REQUEST_CODE_PUSH_TOKENIZE);
         break;
       case "addCardToGooglePay":
+        Map<String,String> address = call.argument("address");
+        String name = call.argument("name");
+        String last4 = call.argument("last4");
+        String opc = call.argument("opaquePaymentCard");
+        String phoneNumber = call.argument("phoneNumber");
+
+        UserAddress userAddress =
+                UserAddress.newBuilder()
+                        .setName(name)
+                        .setAddress1(address.get("addressLine1"))
+                        .setAddress2(address.get("addressLine2"))
+                        .setLocality(address.get("city"))
+                        .setCountryCode(address.get("country"))
+                        .setPostalCode(address.get("postalCode"))
+                        .setPhoneNumber(phoneNumber)
+                        .build();
+
+        PushTokenizeRequest pushTokenizeRequest =
+                new PushTokenizeRequest.Builder()
+                        .setOpaquePaymentCard(opc.getBytes())
+                        .setNetwork(TapAndPay.CARD_NETWORK_VISA)
+                        .setTokenServiceProvider(TapAndPay.TOKEN_PROVIDER_VISA)
+                        .setDisplayName(name)
+                        .setLastDigits(last4)
+                        .setUserAddress(userAddress)
+                        .build();
+
+        tapAndPayClient.pushTokenize(activity, pushTokenizeRequest, REQUEST_CODE_PUSH_TOKENIZE);
         break;
       default: result.notImplemented();
     }
