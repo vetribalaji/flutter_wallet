@@ -43,6 +43,7 @@ class AddToWalletButton extends StatefulWidget {
   final double width;
   final double height;
   final Widget? unsupportedPlatformChild;
+  final Widget? androidButton;
   final FutureOr<PKAddPaymentPassRequest> Function(List<String> certificates, String nonce, String nonceSignature) onData;
   final Future<Map<String, dynamic>> Function(String walletId) onGooglePayWalletIdProvided;
   final Function(String? error) onDone;
@@ -55,6 +56,7 @@ class AddToWalletButton extends StatefulWidget {
     required this.onData,
     required this.onDone,
     required this.onGooglePayWalletIdProvided,
+    this.androidButton,
     this.unsupportedPlatformChild,
   }) : super(key: key);
 
@@ -117,7 +119,7 @@ class _AddToWalletButtonState extends State<AddToWalletButton> {
           creationParamsCodec: const StandardMessageCodec(),
         );
       case TargetPlatform.android:
-        return ElevatedButton(onPressed: _handleAddCardToGooglePay, child: Text("Add to Google Pay"));
+        return widget.androidButton ?? ElevatedButton(onPressed: _handleAddCardToGooglePay, child: Text("Add to Google Pay"));
       default:
         if (widget.unsupportedPlatformChild == null) throw UnsupportedError('Unsupported platform view');
         return widget.unsupportedPlatformChild!;
