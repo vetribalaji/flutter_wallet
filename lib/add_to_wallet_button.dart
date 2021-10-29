@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,28 @@ class PKAddPaymentPassRequest {
   const PKAddPaymentPassRequest(this.encryptedPassData, this.activationData, this.ephemeralPublicKey);
 }
 
+class AddCardToGooglePayData {
+  final String name;
+  final String address1;
+  final String locality;
+  final String administrativeArea;
+  final String countryCode;
+  final String postCode;
+  final String phoneNumber;
+
+  final String opc;
+
+  AddCardToGooglePayData(
+      {required this.opc,
+      required this.name,
+      required this.address1,
+      required this.locality,
+      required this.administrativeArea,
+      required this.countryCode,
+      required this.postCode,
+      required this.phoneNumber});
+}
+
 class AddToWalletButton extends StatefulWidget {
   static const viewType = 'PKAddPassButton';
 
@@ -21,6 +44,7 @@ class AddToWalletButton extends StatefulWidget {
   final double height;
   final Widget? unsupportedPlatformChild;
   final FutureOr<PKAddPaymentPassRequest> Function(List<String> certificates, String nonce, String nonceSignature) onData;
+  final Future<Map<String, dynamic>> Function(String walletId) onGooglePayWalletIdProvided;
   final Function(String? error) onDone;
   final String _id = Uuid().v4();
 
@@ -30,6 +54,7 @@ class AddToWalletButton extends StatefulWidget {
     required this.height,
     required this.onData,
     required this.onDone,
+    required this.onGooglePayWalletIdProvided,
     this.unsupportedPlatformChild,
   }) : super(key: key);
 
@@ -67,6 +92,12 @@ class _AddToWalletButtonState extends State<AddToWalletButton> {
     }
   }
 
+  _handleAddCardToGooglePay() async {
+    final walletId = await AddToWallet.getGooglePayWalletId();
+    final googlePayData = await widget.onGooglePayWalletIdProvided(walletId);
+    await AddToWallet.addCardToGooglePay(args: googlePayData);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -86,7 +117,7 @@ class _AddToWalletButtonState extends State<AddToWalletButton> {
           creationParamsCodec: const StandardMessageCodec(),
         );
       case TargetPlatform.android:
-        return ElevatedButton(onPressed: () async => await AddToWallet.addCardToGooglePay(), child: Text("Add to Google Pay"));
+        return ElevatedButton(onPressed: _handleAddCardToGooglePay, child: Text("Add to Google Pay"));
       default:
         if (widget.unsupportedPlatformChild == null) throw UnsupportedError('Unsupported platform view');
         return widget.unsupportedPlatformChild!;

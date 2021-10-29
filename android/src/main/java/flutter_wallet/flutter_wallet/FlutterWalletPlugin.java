@@ -36,42 +36,18 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler,Act
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-    if (call.method.equals("getPlatformVersion")) {
-      result.success("Android " + android.os.Build.VERSION.RELEASE);
-    } else if(call.method.equals("addCardToGooglePay")) {
-      UserAddress userAddress =
-              UserAddress.newBuilder()
-                      .setName("asd")
-                      .setAddress1("asd")
-                      .setLocality("asd")
-                      .setAdministrativeArea("asd")
-                      .setCountryCode("asd")
-                      .setPostalCode("asd")
-                      .setPhoneNumber("asd")
-                      .build();
-
-     /* PushTokenizeRequest pushTokenizeRequest =
-              new PushTokenizeRequest.Builder()
-                      .setOpaquePaymentCard("1234".getBytes())
-                      .setNetwork(TapAndPay.CARD_NETWORK_VISA)
-                      .setTokenServiceProvider(TapAndPay.TOKEN_PROVIDER_VISA)
-                      .setDisplayName("Test Card")
-                      .setLastDigits("1234")
-                      .setUserAddress(userAddress)
-                      .build();*/
-
-      tapAndPayClient.tokenize(
-              activity,
-              null, // optional issuerTokenId, used to resume a previous activation attempt,
-              TapAndPay.TOKEN_PROVIDER_VISA,
-              "Test",
-              TapAndPay.CARD_NETWORK_VISA,
-              1);
-
-      //tapAndPayClient.pushTokenize(activity, pushTokenizeRequest, REQUEST_CODE_PUSH_TOKENIZE);
-
-    } else {
-      result.notImplemented();
+    switch (call.method) {
+      case "getPlatformVersion":
+        result.success("Android " + android.os.Build.VERSION.RELEASE);
+        break;
+      case "getGooglePayWalletId":
+        String walletId = tapAndPayClient.getActiveWalletId().getResult();
+        result.success(walletId);
+        //tapAndPayClient.pushTokenize(activity, pushTokenizeRequest, REQUEST_CODE_PUSH_TOKENIZE);
+        break;
+      case "addCardToGooglePay":
+        break;
+      default: result.notImplemented();
     }
   }
 

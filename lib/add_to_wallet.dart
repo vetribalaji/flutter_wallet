@@ -9,9 +9,11 @@ class AddToWallet {
   /// Associate each rendered Widget to its `onPressed` event handler
   static final Map<String, FutureOr<dynamic> Function(MethodCall)> _handlers = Map();
 
-  static Future<void> addCardToGooglePay() async {
-    await _channel.invokeMethod('addCardToGooglePay');
+  static Future<void> addCardToGooglePay({dynamic args}) async {
+    await _channel.invokeMethod('addCardToGooglePay', args);
   }
+
+  static Future<String> getGooglePayWalletId() async => await _channel.invokeMethod('getGooglePayWalletId');
 
   factory AddToWallet() => _instance;
 
