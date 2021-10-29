@@ -29,7 +29,7 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler,Act
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-    channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "flutter_wallet");
+    channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "flutter_wallet_handler");
     tapAndPayClient = TapAndPay.getClient(flutterPluginBinding.getApplicationContext());
     channel.setMethodCallHandler(this);
   }
