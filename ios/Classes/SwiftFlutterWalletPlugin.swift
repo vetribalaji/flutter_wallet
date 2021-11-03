@@ -57,6 +57,8 @@ class PKAddPassButtonNativeView: NSObject, FlutterPlatformView, PKAddPaymentPass
     }
 
     func createAddPassButton() {
+        print("Creating PKPassButton...")
+
         let passButton = PKAddPassButton(addPassButtonStyle: PKAddPassButtonStyle.black)
         passButton.frame = CGRect(x: 0, y: 0, width: _width, height: _height)
         passButton.addTarget(self, action: #selector(passButtonAction), for: .touchUpInside)
@@ -82,6 +84,8 @@ class PKAddPassButtonNativeView: NSObject, FlutterPlatformView, PKAddPaymentPass
     }
 
     @objc func passButtonAction() {
+        print("PKPassButton pushed.")
+
         if (!PKAddPaymentPassViewController.canAddPaymentPass()) {
             print("PKAddPaymentPassViewController canAddPaymentPass returned false")
             return
@@ -99,15 +103,19 @@ class PKAddPassButtonNativeView: NSObject, FlutterPlatformView, PKAddPaymentPass
             return
         }
 
-        guard let controller = PKAddPaymentPassViewController(requestConfiguration: config!, delegate: self) else {
+        guard let controller = PKAddPaymentPassViewController.init(requestConfiguration: config!, delegate: self) else {
             print("PKAddPaymentPassViewController is null")
             return
         }
+
+        print("PKAddPaymentPassViewController instantiated")
 
         guard let rootVC = UIApplication.shared.keyWindow?.rootViewController else {
             print("Root VC unavailable")
             return
         }
+
+        print("Presenting PKAddPaymentPassViewController...")
 
         rootVC.present(controller, animated: true)
         //_invokeAddButtonPressed()
