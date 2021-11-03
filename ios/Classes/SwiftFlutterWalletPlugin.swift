@@ -97,13 +97,20 @@ class PKAddPassButtonNativeView: NSObject, FlutterPlatformView, PKAddPaymentPass
         } else {
             config = PKAddPaymentPassRequestConfiguration.init(encryptionScheme: PKEncryptionScheme.ECC_V2)
         }
-        
-        if (config == nil) {
+                
+        guard let config = config else {
             NSLog("PKAddPaymentPassRequestConfiguration is null")
             return
         }
+        
+        config.cardholderName = "John"
+        config.primaryAccountSuffix = "9999" //last 4 or 5digits of card
+        config.localizedDescription = "This will add the card to Apple Pay"
+        config.primaryAccountIdentifier = "test"
+        config.paymentNetwork = PKPaymentNetwork(rawValue: "VISA")
 
-        guard let controller = PKAddPaymentPassViewController.init(requestConfiguration: config!, delegate: self) else {
+
+        guard let controller = PKAddPaymentPassViewController.init(requestConfiguration: config, delegate: self) else {
             NSLog("PKAddPaymentPassViewController is null")
             return
         }
