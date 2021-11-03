@@ -7,14 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_wallet/add_to_wallet.dart';
 import 'package:uuid/uuid.dart';
 
-class PKAddPaymentPassRequest {
-  final String encryptedPassData;
-  final String activationData;
-  final String ephemeralPublicKey;
-
-  const PKAddPaymentPassRequest(this.encryptedPassData, this.activationData, this.ephemeralPublicKey);
-}
-
 class AddCardToGooglePayData {
   final String name;
   final String address1;
@@ -44,6 +36,7 @@ class AddToWalletButton extends StatefulWidget {
   final double height;
   final Widget? unsupportedPlatformChild;
   final Widget? androidButton;
+  final Function? onPressed; // called when the button is pressed.
   final FutureOr<PKAddPaymentPassRequest> Function(List<String> certificates, String nonce, String nonceSignature) onData;
   final Future<Map<String, dynamic>> Function(String walletId) onGooglePayWalletIdProvided;
   final Function(String? error) onDone;
@@ -58,6 +51,7 @@ class AddToWalletButton extends StatefulWidget {
     required this.onGooglePayWalletIdProvided,
     this.androidButton,
     this.unsupportedPlatformChild,
+    this.onPressed,
   }) : super(key: key);
 
   @override
@@ -88,6 +82,9 @@ class _AddToWalletButtonState extends State<AddToWalletButton> {
         return {"activationData": response.activationData, "encryptedPassData": response.encryptedPassData, "ephemeralPublicKey": response.ephemeralPublicKey};
       case "onApplePayFinished":
         widget.onDone(call.arguments == null ? null : call.arguments as String);
+        break;
+      case "onApplePayButtonPressed":
+        if (widget.onPressed != null) widget.onPressed!();
         break;
       default:
         return null;

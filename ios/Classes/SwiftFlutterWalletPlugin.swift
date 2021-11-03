@@ -29,7 +29,7 @@ class PKAddPassButtonNativeViewFactory: NSObject, FlutterPlatformViewFactory {
     }
 }
 
-class PKAddPassButtonNativeView: NSObject, FlutterPlatformView, PKAddPaymentPassViewControllerDelegate {
+class PKAddPassButtonNativeView: NSObject, FlutterPlatformView {
     private var _view: UIView
     private var _key: String
     private var _width: CGFloat
@@ -57,17 +57,56 @@ class PKAddPassButtonNativeView: NSObject, FlutterPlatformView, PKAddPaymentPass
     }
 
     func createAddPassButton() {
-        NSLog("Creating PKPassButton...")
-
         let passButton = PKAddPassButton(addPassButtonStyle: PKAddPassButtonStyle.black)
         passButton.frame = CGRect(x: 0, y: 0, width: _width, height: _height)
         passButton.addTarget(self, action: #selector(passButtonAction), for: .touchUpInside)
         _view.addSubview(passButton)
     }
 
-    func addPaymentPassViewController(_ controller: PKAddPaymentPassViewController, generateRequestWithCertificateChain certificates: [Data], nonce: Data, nonceSignature: Data, completionHandler handler: @escaping (PKAddPaymentPassRequest) -> Void) {
+    @objc func passButtonAction() {
+        _channel.invokeMethod("onApplePayButtonPressed", arguments: nil)
+    }
+}
+
+public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPassViewControllerDelegate {
+  private var channel: FlutterMethodChannel!
+  private var initiateAddPaymentPassFlowResult: FlutterResult?
+    
+  public static func register(with registrar: FlutterPluginRegistrar) {
+    let channel = FlutterMethodChannel(name: "flutter_wallet_handler", binaryMessenger: registrar.messenger())
+
+    let factory = PKAddPassButtonNativeViewFactory(messenger: registrar.messenger(), channel: channel)
+    registrar.register(factory, withId: "PKAddPassButton")
+
+    let instance = SwiftFlutterWalletPlugin()
+    instance.channel = channel
+    registrar.addMethodCallDelegate(instance, channel: channel)
+  }
+
+  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+      if (call.method == "canAddPaymentPass") {
+          return result(PKAddPaymentPassViewController.canAddPaymentPass())
+      } else if (call.method == "initiateAddPaymentPassFlow") {
+          let dict = call.arguments as! Dictionary<String, Any?>
+          initiateAddPaymentPassFlowResult = result
+          
+          return result(SwiftFlutterWalletPlugin.initiateAddPaymentPassFlow(
+            dict["cardholderName"] as! String,
+            dict["primaryAccountSuffix"] as! String,
+            dict["localizedDescription"] as! String,
+            dict["primaryAccountIdentifier"] as! String,
+            dict["paymentNetwork"] as! String,
+            self
+          ))
+      }
+      
+    return result(FlutterMethodNotImplemented)
+  }
+    
+    public func addPaymentPassViewController(_ controller: PKAddPaymentPassViewController, generateRequestWithCertificateChain certificates: [Data], nonce: Data, nonceSignature: Data, completionHandler handler: @escaping (PKAddPaymentPassRequest) -> Void) {
         let map: [String: Any?] = ["certificates": certificates, "nonce": nonce, "nonceSignature": nonceSignature]
-        _channel.invokeMethod("onApplePayDataReceived", arguments: map, result: { result in
+
+        channel.invokeMethod("onApplePayDataReceived", arguments: map, result: { result in
             let paymentPassRequest = PKAddPaymentPassRequest.init()
             guard let resultMap = result as? [String: String?] else {
                 return
@@ -78,73 +117,65 @@ class PKAddPassButtonNativeView: NSObject, FlutterPlatformView, PKAddPaymentPass
             handler(paymentPassRequest)
         })
     }
-
-    func addPaymentPassViewController(_ controller: PKAddPaymentPassViewController, didFinishAdding pass: PKPaymentPass?, error: Error?) {
-        _channel.invokeMethod("onApplePayFinished", arguments: error?.localizedDescription)
+    
+    public func addPaymentPassViewController(_ controller: PKAddPaymentPassViewController, didFinishAdding pass: PKPaymentPass?, error: Error?) {
+        let passDict: [String: Any?] = [
+            "passActivationState": pass?.passActivationState,
+            "primaryAccountIdentifier": pass?.primaryAccountIdentifier,
+            "primaryAccountNumberSuffix": pass?.primaryAccountNumberSuffix,
+            "deviceAccountIdentifier": pass?.deviceAccountIdentifier,
+            "deviceAccountNumberSuffix": pass?.deviceAccountNumberSuffix,
+            "devicePassIdentifier": pass?.devicePassIdentifier,
+            "pairedTerminalIdentifier": pass?.pairedTerminalIdentifier
+        ]
+        
+        if (initiateAddPaymentPassFlowResult != nil) {
+            initiateAddPaymentPassFlowResult?(error != nil ? FlutterError.init(code: "-3", message: error?.localizedDescription, details: nil) : passDict)
+        } else {
+            let resultDict: [String: Any?] = [
+                "error": error?.localizedDescription,
+                "pass": pass == nil ? nil : passDict
+            ]
+            
+            channel.invokeMethod("onApplePayFinished", arguments: resultDict, result: nil)
+        }
+        
+        initiateAddPaymentPassFlowResult = nil
     }
-
-    @objc func passButtonAction() {
-        NSLog("PKPassButton pushed.")
-
+    
+    public static func initiateAddPaymentPassFlow(_ cardholderName: String, _ primaryAccountSuffix: String, _ localizedDescription: String, _ primaryAccountIdentifier: String, _ paymentNetwork: String, _ delegate: PKAddPaymentPassViewControllerDelegate) -> Any? {
         if (!PKAddPaymentPassViewController.canAddPaymentPass()) {
             NSLog("PKAddPaymentPassViewController canAddPaymentPass returned false")
-            return
+            return FlutterError.init(code: "-1", message: "canAddPaymentPass returned false", details: nil)
         }
         
-        var config: PKAddPaymentPassRequestConfiguration?
-        if #available(iOS 10.0, *) {
-            config = PKAddPaymentPassRequestConfiguration.init(encryptionScheme: PKEncryptionScheme.RSA_V2)
-        } else {
-            config = PKAddPaymentPassRequestConfiguration.init(encryptionScheme: PKEncryptionScheme.ECC_V2)
-        }
-                
-        guard let config = config else {
+        guard let config: PKAddPaymentPassRequestConfiguration = PKAddPaymentPassRequestConfiguration.init(encryptionScheme: PKEncryptionScheme.ECC_V2) else {
             NSLog("PKAddPaymentPassRequestConfiguration is null")
-            return
+            
+            return FlutterError.init(code: "-2", message: "PKAddPaymentPassRequestConfiguration is null", details: nil)
         }
         
-        config.cardholderName = "John"
-        config.primaryAccountSuffix = "9999" //last 4 or 5digits of card
-        config.localizedDescription = "This will add the card to Apple Pay"
-        config.primaryAccountIdentifier = "test"
-        config.paymentNetwork = PKPaymentNetwork(rawValue: "VISA")
+        config.cardholderName = cardholderName
+        config.primaryAccountSuffix = primaryAccountSuffix
+        config.localizedDescription = localizedDescription
+        config.primaryAccountIdentifier = primaryAccountIdentifier
+        config.paymentNetwork = PKPaymentNetwork(rawValue: paymentNetwork)
 
-
-        guard let controller = PKAddPaymentPassViewController.init(requestConfiguration: config, delegate: self) else {
+        guard let controller = PKAddPaymentPassViewController.init(requestConfiguration: config, delegate: delegate) else {
             NSLog("PKAddPaymentPassViewController is null")
-            return
+            return FlutterError.init(code: "-2", message: "PKAddPaymentPassViewController is null", details: nil)
         }
 
         NSLog("PKAddPaymentPassViewController instantiated")
 
         guard let rootVC = UIApplication.shared.keyWindow?.rootViewController else {
             NSLog("Root VC unavailable")
-            return
+            return FlutterError.init(code: "-2", message: "Root view controller is null", details: nil)
         }
 
         NSLog("Presenting PKAddPaymentPassViewController...")
 
         rootVC.present(controller, animated: true)
-        //_invokeAddButtonPressed()
+        return nil
     }
-}
-
-public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin {
-  public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "flutter_wallet_handler", binaryMessenger: registrar.messenger())
-
-    let factory = PKAddPassButtonNativeViewFactory(messenger: registrar.messenger(), channel: channel)
-    registrar.register(factory, withId: "PKAddPassButton")
-
-    let instance = SwiftFlutterWalletPlugin()
-    registrar.addMethodCallDelegate(instance, channel: channel)
-  }
-
-  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-      if (call.method == "canAddPaymentPass") {
-          return result(PKAddPaymentPassViewController.canAddPaymentPass())
-      }
-      
-    return result(FlutterMethodNotImplemented)
-  }
 }
