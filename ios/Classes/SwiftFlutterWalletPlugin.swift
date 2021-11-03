@@ -88,16 +88,16 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
           return result(PKAddPaymentPassViewController.canAddPaymentPass())
       } else if (call.method == "initiateAddPaymentPassFlow") {
           let dict = call.arguments as! Dictionary<String, Any?>
-          initiateAddPaymentPassFlowResult = result
-          
-          return result(SwiftFlutterWalletPlugin.initiateAddPaymentPassFlow(
+          let res = SwiftFlutterWalletPlugin.initiateAddPaymentPassFlow(
             dict["cardholderName"] as? String,
             dict["primaryAccountSuffix"] as? String,
             dict["localizedDescription"] as? String,
             dict["primaryAccountIdentifier"] as? String,
             dict["paymentNetwork"] as! String,
             self
-          ))
+          )
+          
+          if (result != nil) result(res) else initiateAddPaymentPassFlowResult = result
       }
       
     return result(FlutterMethodNotImplemented)
@@ -146,7 +146,7 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
         rootVC?.dismiss(animated: true, completion: nil)
     }
     
-    public static func initiateAddPaymentPassFlow(_ cardholderName: String?, _ primaryAccountSuffix: String?, _ localizedDescription: String?, _ primaryAccountIdentifier: String?, _ paymentNetwork: String, _ delegate: PKAddPaymentPassViewControllerDelegate) -> Any? {
+    public static func initiateAddPaymentPassFlow(_ cardholderName: String?, _ primaryAccountSuffix: String?, _ localizedDescription: String?, _ primaryAccountIdentifier: String?, _ paymentNetwork: String, _ delegate: PKAddPaymentPassViewControllerDelegate) -> FlutterError? {
         if (!PKAddPaymentPassViewController.canAddPaymentPass()) {
             NSLog("PKAddPaymentPassViewController canAddPaymentPass returned false")
             return FlutterError.init(code: "-1", message: "canAddPaymentPass returned false", details: nil)
@@ -154,7 +154,6 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
         
         guard let config: PKAddPaymentPassRequestConfiguration = PKAddPaymentPassRequestConfiguration.init(encryptionScheme: PKEncryptionScheme.ECC_V2) else {
             NSLog("PKAddPaymentPassRequestConfiguration is null")
-            
             return FlutterError.init(code: "-2", message: "PKAddPaymentPassRequestConfiguration is null", details: nil)
         }
         
