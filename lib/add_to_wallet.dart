@@ -53,9 +53,9 @@ class AddToWallet {
   Future<dynamic> _handleCalls(MethodCall call) async {
     if (call.method == "onApplePayDataReceived" && call.arguments is Map) {
       if (_applePayOnDataHandler != null) {
-        final certs = call.arguments["certificates"];
-        final nonce = call.arguments["nonce"];
-        final nonceSignature = call.arguments["nonceSignature"];
+        final certs = call.arguments["certificatesBase64"] as List<String>;
+        final nonce = call.arguments["nonceBase64"] as String;
+        final nonceSignature = call.arguments["nonceSignatureBase64"] as String;
 
         final req = await _applePayOnDataHandler!(certs, nonce, nonceSignature);
         return <String, dynamic>{
