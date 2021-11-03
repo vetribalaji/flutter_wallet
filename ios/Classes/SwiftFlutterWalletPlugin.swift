@@ -64,7 +64,7 @@ class PKAddPassButtonNativeView: NSObject, FlutterPlatformView {
     }
 
     @objc func passButtonAction() {
-        _channel.invokeMethod("onApplePayButtonPressed", arguments: nil)
+        _channel.invokeMethod("onApplePayButtonPressed", arguments: ["key": _key])
     }
 }
 
