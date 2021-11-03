@@ -141,6 +141,9 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
         }
         
         initiateAddPaymentPassFlowResult = nil
+        
+        let rootVC = UIApplication.shared.keyWindow?.rootViewController
+        rootVC?.dismiss(animated: true, completion: nil)
     }
     
     public static func initiateAddPaymentPassFlow(_ cardholderName: String?, _ primaryAccountSuffix: String?, _ localizedDescription: String?, _ primaryAccountIdentifier: String?, _ paymentNetwork: String, _ delegate: PKAddPaymentPassViewControllerDelegate) -> Any? {
