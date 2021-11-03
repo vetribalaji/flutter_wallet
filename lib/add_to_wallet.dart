@@ -28,16 +28,20 @@ class AddToWallet {
 
     _applePayOnDataHandler = onData;
 
-    final response = await _channel.invokeMethod('initiateAddPaymentPassFlow', {
-      "cardholderName": cardholderName,
-      "primaryAccountSuffix": primaryAccountSuffix,
-      "localizedDescription": localizedDescription,
-      "primaryAccountIdentifier": primaryAccountIdentifier,
-      "paymentNetwork": paymentNetwork,
-      "requestId": requestId
-    });
+    try {
+      final response = await _channel.invokeMethod('initiateAddPaymentPassFlow', {
+        "cardholderName": cardholderName,
+        "primaryAccountSuffix": primaryAccountSuffix,
+        "localizedDescription": localizedDescription,
+        "primaryAccountIdentifier": primaryAccountIdentifier,
+        "paymentNetwork": paymentNetwork,
+        "requestId": requestId
+      });
 
-    return response;
+      return response;
+    } finally {
+      _applePayOnDataHandler = null;
+    }
   }
 
   static Future<String> getGooglePayWalletId() async => await _channel.invokeMethod('getGooglePayWalletId');
@@ -53,7 +57,7 @@ class AddToWallet {
   Future<dynamic> _handleCalls(MethodCall call) async {
     if (call.method == "onApplePayDataReceived" && call.arguments is Map) {
       if (_applePayOnDataHandler != null) {
-        final certs = call.arguments["certificatesBase64"] as List<String>;
+        final certs = (call.arguments["certificatesBase64"] as List<dynamic>).map((e) => e.toString()).toList(growable: false);
         final nonce = call.arguments["nonceBase64"] as String;
         final nonceSignature = call.arguments["nonceSignatureBase64"] as String;
 
