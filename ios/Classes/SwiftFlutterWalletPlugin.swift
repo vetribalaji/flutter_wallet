@@ -57,7 +57,7 @@ class PKAddPassButtonNativeView: NSObject, FlutterPlatformView, PKAddPaymentPass
     }
 
     func createAddPassButton() {
-        print("Creating PKPassButton...")
+        NSLog("Creating PKPassButton...")
 
         let passButton = PKAddPassButton(addPassButtonStyle: PKAddPassButtonStyle.black)
         passButton.frame = CGRect(x: 0, y: 0, width: _width, height: _height)
@@ -84,10 +84,10 @@ class PKAddPassButtonNativeView: NSObject, FlutterPlatformView, PKAddPaymentPass
     }
 
     @objc func passButtonAction() {
-        print("PKPassButton pushed.")
+        NSLog("PKPassButton pushed.")
 
         if (!PKAddPaymentPassViewController.canAddPaymentPass()) {
-            print("PKAddPaymentPassViewController canAddPaymentPass returned false")
+            NSLog("PKAddPaymentPassViewController canAddPaymentPass returned false")
             return
         }
         
@@ -99,23 +99,23 @@ class PKAddPassButtonNativeView: NSObject, FlutterPlatformView, PKAddPaymentPass
         }
         
         if (config == nil) {
-            print("PKAddPaymentPassRequestConfiguration is null")
+            NSLog("PKAddPaymentPassRequestConfiguration is null")
             return
         }
 
         guard let controller = PKAddPaymentPassViewController.init(requestConfiguration: config!, delegate: self) else {
-            print("PKAddPaymentPassViewController is null")
+            NSLog("PKAddPaymentPassViewController is null")
             return
         }
 
-        print("PKAddPaymentPassViewController instantiated")
+        NSLog("PKAddPaymentPassViewController instantiated")
 
         guard let rootVC = UIApplication.shared.keyWindow?.rootViewController else {
-            print("Root VC unavailable")
+            NSLog("Root VC unavailable")
             return
         }
 
-        print("Presenting PKAddPaymentPassViewController...")
+        NSLog("Presenting PKAddPaymentPassViewController...")
 
         rootVC.present(controller, animated: true)
         //_invokeAddButtonPressed()
