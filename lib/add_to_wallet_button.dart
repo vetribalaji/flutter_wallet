@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -30,25 +29,19 @@ class AddCardToGooglePayData {
 }
 
 class AddToWalletButton extends StatefulWidget {
-  static const viewType = 'PKAddPassButton';
+  static const _viewType = 'PKAddPassButton';
 
   final double width;
   final double height;
   final Widget? unsupportedPlatformChild;
   final Widget? androidButton;
   final Function? onPressed; // called when the button is pressed.
-  final FutureOr<PKAddPaymentPassRequest> Function(List<String> certificates, String nonce, String nonceSignature) onData;
-  final Future<Map<String, dynamic>> Function(String walletId) onGooglePayWalletIdProvided;
-  final Function(String? error) onDone;
   final String _id = Uuid().v4();
 
   AddToWalletButton({
     Key? key,
     required this.width,
     required this.height,
-    required this.onData,
-    required this.onDone,
-    required this.onGooglePayWalletIdProvided,
     this.androidButton,
     this.unsupportedPlatformChild,
     this.onPressed,
@@ -73,7 +66,7 @@ class _AddToWalletButtonState extends State<AddToWalletButton> {
 
   Future<dynamic> _onMethodCall(MethodCall call) async {
     switch (call.method) {
-      case "onApplePayDataReceived":
+/*      case "onApplePayDataReceived":
         final List<String> certificates = call.arguments["certificates"];
         final String nonce = call.arguments["nonce"];
         final String nonceSignature = call.arguments["nonceSignature"];
@@ -82,7 +75,7 @@ class _AddToWalletButtonState extends State<AddToWalletButton> {
         return {"activationData": response.activationData, "encryptedPassData": response.encryptedPassData, "ephemeralPublicKey": response.ephemeralPublicKey};
       case "onApplePayFinished":
         widget.onDone(call.arguments == null ? null : call.arguments as String);
-        break;
+        break;*/
       case "onApplePayButtonPressed":
         if (widget.onPressed != null) widget.onPressed!();
         break;
@@ -93,24 +86,22 @@ class _AddToWalletButtonState extends State<AddToWalletButton> {
 
   _handleAddCardToGooglePay() async {
     final walletId = await AddToWallet.getGooglePayWalletId();
-    final googlePayData = await widget.onGooglePayWalletIdProvided(walletId);
-    await AddToWallet.addCardToGooglePay(args: googlePayData);
+    /*final googlePayData = await widget.onGooglePayWalletIdProvided(walletId);
+    await AddToWallet.addCardToGooglePay(args: googlePayData);*/
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       width: widget.width,
       height: widget.height,
       child: platformWidget(context),
     );
-  }
 
   Widget platformWidget(BuildContext context) {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
         return UiKitView(
-          viewType: AddToWalletButton.viewType,
+          viewType: AddToWalletButton._viewType,
           layoutDirection: Directionality.of(context),
           creationParams: uiKitCreationParams,
           creationParamsCodec: const StandardMessageCodec(),

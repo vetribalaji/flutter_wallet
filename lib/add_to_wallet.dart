@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:uuid/uuid.dart';
 
 class AddToWallet {
   static const MethodChannel _channel = const MethodChannel('flutter_wallet_handler');
@@ -11,7 +10,6 @@ class AddToWallet {
   static final Map<String, FutureOr<dynamic> Function(MethodCall)> _handlers = Map();
 
   static FutureOr<PKAddPaymentPassRequest> Function(List<String>, String, String)? _applePayOnDataHandler;
-  static FutureOr<void> Function()? _applePayOnFinishedHandler;
 
   static Future<void> addCardToGooglePay({dynamic args}) async {
     await _channel.invokeMethod('addCardToGooglePay', args);
@@ -22,10 +20,8 @@ class AddToWallet {
     return await _channel.invokeMethod('canAddPaymentPass');
   }
 
-  // For iOS.
-  static Future<dynamic> initiateAddPaymentPassFlow({required String cardholderName, required String primaryAccountSuffix, required String localizedDescription, required String primaryAccountIdentifier, required String paymentNetwork, required FutureOr<PKAddPaymentPassRequest> Function(List<String> certificates, String nonce, String nonceSignature) onData}) async {
-    final requestId = Uuid().v4();
-
+  // For iOS. At least one of cardholder name or primaryAccountSuffix must be supplied.
+  static Future<dynamic> initiateAddPaymentPassFlow({String? cardholderName, String? primaryAccountSuffix, String? localizedDescription, String? primaryAccountIdentifier, String? paymentNetwork, required FutureOr<PKAddPaymentPassRequest> Function(List<String> certificates, String nonce, String nonceSignature) onData}) async {
     _applePayOnDataHandler = onData;
 
     try {
@@ -35,7 +31,6 @@ class AddToWallet {
         "localizedDescription": localizedDescription,
         "primaryAccountIdentifier": primaryAccountIdentifier,
         "paymentNetwork": paymentNetwork,
-        "requestId": requestId
       });
 
       return response;

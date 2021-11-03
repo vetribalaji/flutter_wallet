@@ -93,7 +93,7 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
             dict["primaryAccountSuffix"] as? String,
             dict["localizedDescription"] as? String,
             dict["primaryAccountIdentifier"] as? String,
-            dict["paymentNetwork"] as! String,
+            dict["paymentNetwork"] as? String,
             self
           )
           
@@ -120,6 +120,7 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
             paymentPassRequest.encryptedPassData = resultMap["encryptedPassData"]??.data(using: String.Encoding.utf8)
             paymentPassRequest.activationData = resultMap["activationData"]??.data(using: String.Encoding.utf8)
             paymentPassRequest.ephemeralPublicKey = resultMap["ephemeralPublicKey"]??.data(using: String.Encoding.utf8)
+            
             handler(paymentPassRequest)
         })
     }
@@ -152,7 +153,7 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
         rootVC?.dismiss(animated: true, completion: nil)
     }
     
-    public static func initiateAddPaymentPassFlow(_ cardholderName: String?, _ primaryAccountSuffix: String?, _ localizedDescription: String?, _ primaryAccountIdentifier: String?, _ paymentNetwork: String, _ delegate: PKAddPaymentPassViewControllerDelegate) -> FlutterError? {
+    public static func initiateAddPaymentPassFlow(_ cardholderName: String?, _ primaryAccountSuffix: String?, _ localizedDescription: String?, _ primaryAccountIdentifier: String?, _ paymentNetwork: String?, _ delegate: PKAddPaymentPassViewControllerDelegate) -> FlutterError? {
         if (!PKAddPaymentPassViewController.canAddPaymentPass()) {
             NSLog("PKAddPaymentPassViewController canAddPaymentPass returned false")
             return FlutterError.init(code: "-1", message: "canAddPaymentPass returned false", details: nil)
@@ -167,7 +168,7 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
         config.primaryAccountSuffix = primaryAccountSuffix
         config.localizedDescription = localizedDescription
         config.primaryAccountIdentifier = primaryAccountIdentifier
-        config.paymentNetwork = PKPaymentNetwork(rawValue: paymentNetwork)
+        config.paymentNetwork = paymentNetwork != nil ? PKPaymentNetwork(rawValue: paymentNetwork!) : nil
 
         guard let controller = PKAddPaymentPassViewController.init(requestConfiguration: config, delegate: delegate) else {
             NSLog("PKAddPaymentPassViewController is null")

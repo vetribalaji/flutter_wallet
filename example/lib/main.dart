@@ -27,12 +27,6 @@ class _MyAppState extends State<MyApp> {
     setState(() {});
   }
 
-  Future<PKAddPaymentPassRequest> _onAppleDataReceived(List<String> certificates, String nonce, String nonceSignature) async {
-    return PKAddPaymentPassRequest("", "", "");
-  }
-
-  _onDone(String? error) {}
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -41,7 +35,7 @@ class _MyAppState extends State<MyApp> {
         body: Column(
           children: [
             Text("canAddPaymentPass: $canAddPaymentPass"),
-            LayoutBuilder(builder: (context, constraints) => AddToWalletButton(onData: _onAppleDataReceived, onDone: _onDone, width: constraints.maxWidth, height: 100, onGooglePayWalletIdProvided: (String walletId) async => <String, dynamic>{} )),
+            LayoutBuilder(builder: (context, constraints) => AddToWalletButton(width: constraints.maxWidth, height: 100)),
           ],
         ),
       ),
