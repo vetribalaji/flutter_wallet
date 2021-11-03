@@ -13,6 +13,11 @@ class AddToWallet {
     await _channel.invokeMethod('addCardToGooglePay', args);
   }
 
+  // Returns whether this app can add payment passes or not on iOS.
+  static Future<bool> canAddPaymentPass() async {
+    return await _channel.invokeMethod('canAddPaymentPass');
+  }
+
   static Future<String> getGooglePayWalletId() async => await _channel.invokeMethod('getGooglePayWalletId');
 
   factory AddToWallet() => _instance;

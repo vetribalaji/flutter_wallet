@@ -82,12 +82,24 @@ class PKAddPassButtonNativeView: NSObject, FlutterPlatformView, PKAddPaymentPass
     }
 
     @objc func passButtonAction() {
-        guard let config = PKAddPaymentPassRequestConfiguration.init(encryptionScheme: PKEncryptionScheme.ECC_V2) else {
+        if (!PKAddPaymentPassViewController.canAddPaymentPass()) {
+            print("PKAddPaymentPassViewController canAddPaymentPass returned false")
+            return
+        }
+        
+        var config: PKAddPaymentPassRequestConfiguration?
+        if #available(iOS 10.0, *) {
+            config = PKAddPaymentPassRequestConfiguration.init(encryptionScheme: PKEncryptionScheme.RSA_V2)
+        } else {
+            config = PKAddPaymentPassRequestConfiguration.init(encryptionScheme: PKEncryptionScheme.ECC_V2)
+        }
+        
+        if (config == nil) {
             print("PKAddPaymentPassRequestConfiguration is null")
             return
         }
 
-        guard let controller = PKAddPaymentPassViewController(requestConfiguration: config, delegate: self) else {
+        guard let controller = PKAddPaymentPassViewController(requestConfiguration: config!, delegate: self) else {
             print("PKAddPaymentPassViewController is null")
             return
         }
@@ -104,7 +116,7 @@ class PKAddPassButtonNativeView: NSObject, FlutterPlatformView, PKAddPaymentPass
 
 public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "flutter_wallet", binaryMessenger: registrar.messenger())
+    let channel = FlutterMethodChannel(name: "flutter_wallet_handler", binaryMessenger: registrar.messenger())
 
     let factory = PKAddPassButtonNativeViewFactory(messenger: registrar.messenger(), channel: channel)
     registrar.register(factory, withId: "PKAddPassButton")
@@ -114,6 +126,10 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin {
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+      if (call.method == "canAddPaymentPass") {
+          return result(PKAddPaymentPassViewController.canAddPaymentPass())
+      }
+      
     return result(FlutterMethodNotImplemented)
   }
 }
