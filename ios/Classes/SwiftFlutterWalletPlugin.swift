@@ -102,6 +102,8 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
           } else {
               initiateAddPaymentPassFlowResult = result
           }
+          
+          return
       }
       
     return result(FlutterMethodNotImplemented)
