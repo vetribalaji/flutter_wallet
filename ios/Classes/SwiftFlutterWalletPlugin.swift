@@ -91,10 +91,10 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
           initiateAddPaymentPassFlowResult = result
           
           return result(SwiftFlutterWalletPlugin.initiateAddPaymentPassFlow(
-            dict["cardholderName"] as! String,
-            dict["primaryAccountSuffix"] as! String,
-            dict["localizedDescription"] as! String,
-            dict["primaryAccountIdentifier"] as! String,
+            dict["cardholderName"] as? String,
+            dict["primaryAccountSuffix"] as? String,
+            dict["localizedDescription"] as? String,
+            dict["primaryAccountIdentifier"] as? String,
             dict["paymentNetwork"] as! String,
             self
           ))
@@ -143,7 +143,7 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
         initiateAddPaymentPassFlowResult = nil
     }
     
-    public static func initiateAddPaymentPassFlow(_ cardholderName: String, _ primaryAccountSuffix: String, _ localizedDescription: String, _ primaryAccountIdentifier: String, _ paymentNetwork: String, _ delegate: PKAddPaymentPassViewControllerDelegate) -> Any? {
+    public static func initiateAddPaymentPassFlow(_ cardholderName: String?, _ primaryAccountSuffix: String?, _ localizedDescription: String?, _ primaryAccountIdentifier: String?, _ paymentNetwork: String, _ delegate: PKAddPaymentPassViewControllerDelegate) -> Any? {
         if (!PKAddPaymentPassViewController.canAddPaymentPass()) {
             NSLog("PKAddPaymentPassViewController canAddPaymentPass returned false")
             return FlutterError.init(code: "-1", message: "canAddPaymentPass returned false", details: nil)
