@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
@@ -13,7 +14,10 @@ class FlutterWallet {
   static FutureOr<PKAddPaymentPassRequest> Function(List<String>, String, String)? _applePayOnDataHandler;
 
   // Returns whether this app can add payment passes or not on iOS.
-  static Future<bool> canAddPaymentPass() async => (await _channel.invokeMethod('canAddPaymentPass')) == true;
+  static Future<bool> canAddPaymentPass() async {
+    if (Platform.isIOS) return (await _channel.invokeMethod('canAddPaymentPass')) == true;
+    return false;
+  }
 
   // For Android only. Adds a card to Google Pay.
   static Future<void> initiateGooglePayCardFlow({required String displayName, required String phoneNumber, required FutureOr<GooglePayRequest> Function(String walletId, String deviceId) onData}) async {
