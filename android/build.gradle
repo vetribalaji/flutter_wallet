@@ -16,11 +16,22 @@ rootProject.allprojects {
     repositories {
         google()
         jcenter()
-        maven { url "file:/Users/gabor/FlutterDev/flutter_wallet/android/tapandpaysdk" }
 
-        maven { url "file:./tapandpaysdk/" }
-        maven { url "file:../../tapandpaysdk" }
-        maven { url "file:../../../tapandpaysdk" }
+        flatDir {
+            dirs 'tapandpaysdk'
+        }
+
+        maven { url "file://android/tapandpaysdk/" }
+        maven { url "file://android/tapandpaysdk" }
+        maven { url "file://tapandpaysdk/" }
+        maven { url "file://tapandpaysdk" }
+        maven { url "file://./tapandpaysdk/" }
+        maven { url "file://./tapandpaysdk" }
+        maven { url "file://../tapandpaysdk" }
+        maven { url "file://../tapandpaysdk/" }
+        maven { url "file://../../tapandpaysdk" }
+        maven { url "file://../../tapandpaysdk/" }
+
         mavenLocal()
     }
 }
