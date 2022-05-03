@@ -21,17 +21,6 @@ rootProject.allprojects {
             dirs 'tapandpaysdk'
         }
 
-        maven { url "file://android/tapandpaysdk/" }
-        maven { url "file://android/tapandpaysdk" }
-        maven { url "file://tapandpaysdk/" }
-        maven { url "file://tapandpaysdk" }
-        maven { url "file://./tapandpaysdk/" }
-        maven { url "file://./tapandpaysdk" }
-        maven { url "file://../tapandpaysdk" }
-        maven { url "file://../tapandpaysdk/" }
-        maven { url "file://../../tapandpaysdk" }
-        maven { url "file://../../tapandpaysdk/" }
-
         mavenLocal()
     }
 }
@@ -47,7 +36,9 @@ android {
 
     dependencies{
         //implementation fileTree(dir: 'libs', include: ['*.aar'])
-        implementation 'com.google.android.gms:play-services-tapandpay:17.1.2'
+        implementation(name:'play-services-tapandpay-17.1.2', ext:'aar')
+
+        /*implementation 'com.google.android.gms:play-services-tapandpay:17.1.2'*/
         implementation 'com.google.android.gms:play-services-base:17.2.1'
     }
 }
