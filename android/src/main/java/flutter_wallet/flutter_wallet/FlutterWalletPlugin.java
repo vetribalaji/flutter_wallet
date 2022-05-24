@@ -100,6 +100,7 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler, Ac
     @Override
     public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
         this.activity = binding.getActivity();
+        binding.addActivityResultListener(this);
     }
 
     @Override
