@@ -36,9 +36,9 @@ android {
 
     dependencies{
         //implementation fileTree(dir: 'libs', include: ['*.aar'])
-        implementation(name:'play-services-tapandpay-17.1.2', ext:'aar')
+        implementation(name:'play-services-tapandpay-18.2.0', ext:'aar')
 
         /*implementation 'com.google.android.gms:play-services-tapandpay:17.1.2'*/
-        implementation 'com.google.android.gms:play-services-base:17.2.1'
+        implementation 'com.google.android.gms:play-services-base:18.0.1'
     }
 }
