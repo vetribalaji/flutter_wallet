@@ -29,11 +29,12 @@ import io.flutter.plugin.common.PluginRegistry;
  * FlutterWalletPlugin
  */
 public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegistry.ActivityResultListener {
+    private static final int REQUEST_CODE_PUSH_TOKENIZE = 99927200;
+
     private MethodChannel channel;
     private TapAndPayClient tapAndPayClient;
     private Activity activity;
-    private static final int REQUEST_CODE_PUSH_TOKENIZE = 99927200;
-
+    private Result tokenizeResult;
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
@@ -83,6 +84,7 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler, Ac
                                 .setUserAddress(userAddress)
                                 .build();
 
+                tokenizeResult = result;
                 tapAndPayClient.pushTokenize(activity, pushTokenizeRequest, REQUEST_CODE_PUSH_TOKENIZE);
                 break;
             default:
@@ -104,8 +106,12 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler, Ac
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_PUSH_TOKENIZE) {
             if (resultCode == Activity.RESULT_OK) {
-
+                if (tokenizeResult != null) tokenizeResult.success(null);
+            } else {
+                if (tokenizeResult != null) tokenizeResult.error("-1", "Card provisioning failed.", null);
             }
+
+            tokenizeResult = null;
 
             return true;
         }
@@ -123,5 +129,6 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
     @Override
     public void onDetachedFromActivity() {
+        activity = null;
     }
 }

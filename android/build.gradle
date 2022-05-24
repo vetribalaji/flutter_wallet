@@ -4,7 +4,6 @@ version '1.0'
 buildscript {
     repositories {
         google()
-        jcenter()
     }
 
     dependencies {
@@ -15,7 +14,6 @@ buildscript {
 rootProject.allprojects {
     repositories {
         google()
-        jcenter()
 
         flatDir {
             dirs 'tapandpaysdk'
@@ -38,7 +36,6 @@ android {
         //implementation fileTree(dir: 'libs', include: ['*.aar'])
         implementation(name:'play-services-tapandpay-18.2.0', ext:'aar')
 
-        /*implementation 'com.google.android.gms:play-services-tapandpay:17.1.2'*/
         implementation 'com.google.android.gms:play-services-base:18.0.1'
     }
 }
