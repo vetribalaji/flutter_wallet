@@ -3,6 +3,7 @@ package flutter_wallet.flutter_wallet;
 import android.app.Activity;
 import android.content.Intent;
 
+import android.util.Base64;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tapandpay.TapAndPay;
@@ -74,9 +75,12 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler, Ac
                                 .setPhoneNumber((String) call.argument("phoneNumber"))
                                 .build();
 
+                String opaquePaymentCard = call.argument("opaquePaymentCard").toString();
+                byte[] opaquePaymentCardBytes = Base64.decode(opaquePaymentCard, Base64.DEFAULT);
+
                 PushTokenizeRequest pushTokenizeRequest =
                         new PushTokenizeRequest.Builder()
-                                .setOpaquePaymentCard(call.argument("opaquePaymentCard").toString().getBytes())
+                                .setOpaquePaymentCard(opaquePaymentCardBytes)
                                 .setNetwork(TapAndPay.CARD_NETWORK_VISA)
                                 .setTokenServiceProvider(TapAndPay.TOKEN_PROVIDER_VISA)
                                 .setDisplayName(call.argument("displayName").toString())
