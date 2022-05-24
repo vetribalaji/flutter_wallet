@@ -89,11 +89,10 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler, Ac
                                 .build();
 
                 String opaquePaymentCard = call.argument("opaquePaymentCard").toString();
-                byte[] opaquePaymentCardBytes = Base64.decode(opaquePaymentCard, Base64.DEFAULT);
 
                 PushTokenizeRequest pushTokenizeRequest =
                         new PushTokenizeRequest.Builder()
-                                .setOpaquePaymentCard(opaquePaymentCardBytes)
+                                .setOpaquePaymentCard(opaquePaymentCard.getBytes())
                                 .setNetwork(TapAndPay.CARD_NETWORK_VISA)
                                 .setTokenServiceProvider(TapAndPay.TOKEN_PROVIDER_VISA)
                                 .setDisplayName(call.argument("displayName").toString())
