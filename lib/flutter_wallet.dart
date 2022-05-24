@@ -33,7 +33,7 @@ class FlutterWallet {
       "last4": response.last4,
       "opaquePaymentCard": response.opaquePaymentCard,
       "phoneNumber": phoneNumber,
-      "address": {"addressLine1": response.address.addressLine1, "addressLine2": response.address.addressLine2, "city": response.address.city, "country": response.address.country, "postalCode": response.address.postalCode}
+      "address": {"addressLine1": response.address.addressLine1, "addressLine2": response.address.addressLine2, "city": response.address.city, "country": response.address.country, "postalCode": response.address.postalCode, "administrativeArea": response.address.administrativeArea}
     });
   }
 
@@ -118,7 +118,7 @@ class GooglePayRequest {
 }
 
 class GoogleUserAddress {
-  final String addressLine1, addressLine2, city, country, postalCode;
+  final String addressLine1, addressLine2, city, country, postalCode, administrativeArea;
 
-  const GoogleUserAddress({required this.addressLine1, required this.addressLine2, required this.city, required this.country, required this.postalCode});
+  const GoogleUserAddress({required this.administrativeArea, required this.addressLine1, required this.addressLine2, required this.city, required this.country, required this.postalCode});
 }

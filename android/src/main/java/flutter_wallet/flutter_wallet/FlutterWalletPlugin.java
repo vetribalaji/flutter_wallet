@@ -68,6 +68,7 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler, Ac
                                 .setAddress2(address.get("addressLine2"))
                                 .setLocality(address.get("city"))
                                 .setCountryCode(address.get("country"))
+                                .setAdministrativeArea(address.get("administrativeArea"))
                                 .setPostalCode(address.get("postalCode"))
                                 .setPhoneNumber((String) call.argument("phoneNumber"))
                                 .build();
