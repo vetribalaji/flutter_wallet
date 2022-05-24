@@ -47,6 +47,19 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler, Ac
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull final Result result) {
         switch (call.method) {
+            case "getStableHardwareId":
+                tapAndPayClient.getStableHardwareId().addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (task.isSuccessful()) {
+                            result.success(task.getResult());
+                        } else {
+                            String message = task.getException().getLocalizedMessage();
+                            result.error("-1", message, null);
+                        }
+                    }
+                });
+                break;
             case "getGooglePayWalletId":
                 tapAndPayClient.getActiveWalletId().addOnCompleteListener(new OnCompleteListener<String>() {
                     @Override

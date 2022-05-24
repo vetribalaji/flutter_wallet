@@ -22,11 +22,8 @@ class FlutterWallet {
   // For Android only. Adds a card to Google Pay.
   static Future<void> initiateGooglePayCardFlow({required String displayName, required String phoneNumber, required FutureOr<GooglePayRequest> Function(String walletId, String deviceId) onData}) async {
     final walletId = await getGooglePayWalletId();
-
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-
-    final response = await onData(walletId, androidInfo.androidId!);
+    final hardwareId = await getGooglePayStableHardwareId();
+    final response = await onData(walletId, hardwareId);
 
     await _channel.invokeMethod('addCardToGooglePay', {
       "displayName": displayName,
@@ -64,6 +61,8 @@ class FlutterWallet {
 
   static Future<String> getGooglePayWalletId() async => await _channel.invokeMethod('getGooglePayWalletId');
 
+  static Future<String> getGooglePayStableHardwareId() async => await _channel.invokeMethod('getStableHardwareId');
+  
   factory FlutterWallet() => _instance;
 
   FlutterWallet._internal() {
