@@ -168,12 +168,51 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
             NSLog("PKAddPaymentPassRequestConfiguration is null")
             return FlutterError.init(code: "-2", message: "PKAddPaymentPassRequestConfiguration is null", details: nil)
         }
-        
+
+        let parsedPaymentNetwork: PKPaymentNetwork
+        switch (paymentNetwork) {
+        case "amex":
+            parsedPaymentNetwork = .amex
+            break
+        case "visa":
+            parsedPaymentNetwork = .visa
+            break
+        case "masterCard":
+            parsedPaymentNetwork = .masterCard
+            break
+        case "JCB":
+            if #available(iOS 10.1, *) {
+                parsedPaymentNetwork = .JCB
+            } else {
+                return FlutterError.init(code: "-3", message: "JCB not available on this platform", details: nil)
+            }
+            break
+        case "discover":
+            parsedPaymentNetwork = .discover
+            break
+        case "electron":
+            if #available(iOS 12.0, *) {
+                parsedPaymentNetwork = .electron
+            } else {
+                return FlutterError.init(code: "-3", message: "electron not available on this platform", details: nil)
+            }
+            break
+        case "maestro":
+            if #available(iOS 12.0, *) {
+                parsedPaymentNetwork = .maestro
+            } else {
+                return FlutterError.init(code: "-3", message: "maestro not available on this platform", details: nil)
+            }
+            break
+        default:
+            return FlutterError.init(code: "-3", message: "Invalid payment network", details: nil)
+        }
+            
         config.cardholderName = cardholderName
         config.primaryAccountSuffix = primaryAccountSuffix
         config.localizedDescription = localizedDescription
         config.primaryAccountIdentifier = primaryAccountIdentifier
-        config.paymentNetwork = paymentNetwork != nil ? PKPaymentNetwork(rawValue: paymentNetwork!) : nil
+        config.paymentNetwork = parsedPaymentNetwork
 
         guard let controller = PKAddPaymentPassViewController.init(requestConfiguration: config, delegate: delegate) else {
             NSLog("PKAddPaymentPassViewController is null")

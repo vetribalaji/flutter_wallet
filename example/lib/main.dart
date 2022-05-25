@@ -45,6 +45,6 @@ class _MyAppState extends State<MyApp> {
     );
 
   _startGooglePay() {
-    FlutterWallet.initiateGooglePayCardFlow(displayName: "John Smith", phoneNumber: "+1111111111", onData: (walletId, deviceId) => GooglePayRequest("1234", "34234", GoogleUserAddress(city: "Atlanta", country: "US", postalCode: "30318", addressLine1: "222333 Peachtree Place", addressLine2: "")));
+    FlutterWallet.initiateGooglePayCardFlow(displayName: "John Smith", phoneNumber: "+1111111111", onData: (walletId, deviceId) => GooglePayRequest("1234", "34234", GoogleUserAddress(city: "Atlanta", country: "US", postalCode: "30318", addressLine1: "222333 Peachtree Place", addressLine2: "", administrativeArea: "GA")));
   }
 }

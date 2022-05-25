@@ -1,5 +1,6 @@
 import UIKit
 import Flutter
+import PassKit
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {

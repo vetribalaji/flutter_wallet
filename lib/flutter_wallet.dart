@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/services.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 
 class FlutterWallet {
   static const MethodChannel _channel = const MethodChannel('flutter_wallet_handler');
@@ -40,7 +39,7 @@ class FlutterWallet {
       String? primaryAccountSuffix,
       String? localizedDescription,
       String? primaryAccountIdentifier,
-      String? paymentNetwork,
+      required PaymentNetwork paymentNetwork,
       required FutureOr<PKAddPaymentPassRequest> Function(List<String> certificates, String nonce, String nonceSignature) onData}) async {
     _applePayOnDataHandler = onData;
 
@@ -50,7 +49,7 @@ class FlutterWallet {
         "primaryAccountSuffix": primaryAccountSuffix,
         "localizedDescription": localizedDescription,
         "primaryAccountIdentifier": primaryAccountIdentifier,
-        "paymentNetwork": paymentNetwork,
+        "paymentNetwork": paymentNetwork.name,
       });
 
       return response;
@@ -120,4 +119,8 @@ class GoogleUserAddress {
   final String addressLine1, addressLine2, city, country, postalCode, administrativeArea;
 
   const GoogleUserAddress({required this.administrativeArea, required this.addressLine1, required this.addressLine2, required this.city, required this.country, required this.postalCode});
+}
+
+enum PaymentNetwork {
+  amex, visa, masterCard, JCB, discover, electron, maestro
 }
