@@ -30,7 +30,7 @@ class FlutterWallet {
       "last4": response.last4,
       "opaquePaymentCard": response.opaquePaymentCard,
       "phoneNumber": phoneNumber,
-      "address": {"addressLine1": response.address.addressLine1, "addressLine2": response.address.addressLine2, "city": response.address.city, "country": response.address.country, "postalCode": response.address.postalCode, "administrativeArea": response.address.administrativeArea}
+      "address": response.address == null ? null : {"addressLine1": response.address.addressLine1, "addressLine2": response.address.addressLine2, "city": response.address.city, "country": response.address.country, "postalCode": response.address.postalCode, "administrativeArea": response.address.administrativeArea}
     });
   }
 
@@ -109,7 +109,7 @@ class PKAddPaymentPassRequest {
 }
 
 class GooglePayRequest {
-  final GoogleUserAddress address;
+  final GoogleUserAddress? address;
   final String last4;
   final String opaquePaymentCard;
 

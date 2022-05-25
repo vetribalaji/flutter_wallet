@@ -76,17 +76,19 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler, Ac
             case "addCardToGooglePay":
                 Map<String, String> address = call.argument("address");
 
-                UserAddress userAddress =
-                        UserAddress.newBuilder()
-                                .setName((String) call.argument("displayName"))
-                                .setAddress1(address.get("addressLine1"))
-                                .setAddress2(address.get("addressLine2"))
-                                .setLocality(address.get("city"))
-                                .setCountryCode(address.get("country"))
-                                .setAdministrativeArea(address.get("administrativeArea"))
-                                .setPostalCode(address.get("postalCode"))
-                                .setPhoneNumber((String) call.argument("phoneNumber"))
-                                .build();
+                UserAddress.Builder builder = UserAddress.newBuilder();
+
+                builder.setName((String) call.argument("displayName"))
+                builder.setPhoneNumber((String) call.argument("phoneNumber"))
+
+                if (address != null) {
+                    builder.setAddress1(address.get("addressLine1"))
+                            .setAddress2(address.get("addressLine2"))
+                            .setLocality(address.get("city"))
+                            .setCountryCode(address.get("country"))
+                            .setAdministrativeArea(address.get("administrativeArea"))
+                            .setPostalCode(address.get("postalCode"));
+                }
 
                 String opaquePaymentCard = call.argument("opaquePaymentCard").toString();
 
@@ -97,7 +99,7 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler, Ac
                                 .setTokenServiceProvider(TapAndPay.TOKEN_PROVIDER_VISA)
                                 .setDisplayName(call.argument("displayName").toString())
                                 .setLastDigits(call.argument("last4").toString())
-                                .setUserAddress(userAddress)
+                                .setUserAddress(builder.build())
                                 .build();
 
                 tokenizeResult = result;
