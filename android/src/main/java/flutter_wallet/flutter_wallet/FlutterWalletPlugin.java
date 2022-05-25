@@ -78,8 +78,8 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler, Ac
 
                 UserAddress.Builder builder = UserAddress.newBuilder();
 
-                builder.setName((String) call.argument("displayName"))
-                builder.setPhoneNumber((String) call.argument("phoneNumber"))
+                builder.setName((String) call.argument("displayName"));
+                builder.setPhoneNumber((String) call.argument("phoneNumber"));
 
                 if (address != null) {
                     builder.setAddress1(address.get("addressLine1"))
