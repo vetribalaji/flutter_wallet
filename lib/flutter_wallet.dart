@@ -73,9 +73,9 @@ class FlutterWallet {
   Future<dynamic> _handleCalls(MethodCall call) async {
     if (call.method == "onApplePayDataReceived" && call.arguments is Map) {
       if (_applePayOnDataHandler != null) {
-        final certs = (call.arguments["certificatesBase64"] as List<String>);
-        final nonce = call.arguments["nonceBase64"] as String;
-        final nonceSignature = call.arguments["nonceSignatureBase64"] as String;
+        final List<String> certs = (call.arguments["certificatesBase64"] as List<dynamic>).map((e) => e.toString()).toList(growable: false);
+        final String nonce = call.arguments["nonceBase64"].toString();
+        final String nonceSignature = call.arguments["nonceSignatureBase64"].toString();
 
         final req = await _applePayOnDataHandler!(certs, nonce, nonceSignature);
         return <String, dynamic>{"encryptedPassData": req.encryptedPassData, "activationData": req.activationData, "ephemeralPublicKey": req.ephemeralPublicKey};
