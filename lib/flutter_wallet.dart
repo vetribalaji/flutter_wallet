@@ -10,7 +10,7 @@ class FlutterWallet {
   /// Associate each rendered Widget to its `onPressed` event handler
   static final Map<String, FutureOr<dynamic> Function(MethodCall)> _handlers = Map();
 
-  static FutureOr<PKAddPaymentPassRequest> Function(List<dynamic>, dynamic, dynamic)? _applePayOnDataHandler;
+  static FutureOr<PKAddPaymentPassRequest> Function(List<String>, String, String)? _applePayOnDataHandler;
 
   // Returns whether this app can add payment passes or not on iOS.
   static Future<bool> canAddPaymentPass() async {
@@ -40,7 +40,7 @@ class FlutterWallet {
       String? localizedDescription,
       String? primaryAccountIdentifier,
       required PaymentNetwork paymentNetwork,
-      required FutureOr<PKAddPaymentPassRequest> Function(List<dynamic> certificates, dynamic nonce, dynamic nonceSignature) onData}) async {
+      required FutureOr<PKAddPaymentPassRequest> Function(List<String> certificates, String nonce, String nonceSignature) onData}) async {
     _applePayOnDataHandler = onData;
 
     try {
@@ -73,9 +73,9 @@ class FlutterWallet {
   Future<dynamic> _handleCalls(MethodCall call) async {
     if (call.method == "onApplePayDataReceived" && call.arguments is Map) {
       if (_applePayOnDataHandler != null) {
-        final certs = (call.arguments["certificatesBase64"] as List<dynamic>);
-        final nonce = call.arguments["nonceBase64"] as dynamic;
-        final nonceSignature = call.arguments["nonceSignatureBase64"] as dynamic;
+        final certs = (call.arguments["certificatesBase64"] as List<String>);
+        final nonce = call.arguments["nonceBase64"] as String;
+        final nonceSignature = call.arguments["nonceSignatureBase64"] as String;
 
         final req = await _applePayOnDataHandler!(certs, nonce, nonceSignature);
         return <String, dynamic>{"encryptedPassData": req.encryptedPassData, "activationData": req.activationData, "ephemeralPublicKey": req.ephemeralPublicKey};

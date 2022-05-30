@@ -124,10 +124,6 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
             paymentPassRequest.encryptedPassData = Data.init(base64Encoded: resultMap["encryptedPassData"]!!)
             paymentPassRequest.activationData = resultMap["activationData"]??.data(using: String.Encoding.utf8)
             paymentPassRequest.ephemeralPublicKey = Data.init(base64Encoded: resultMap["ephemeralPublicKey"]!!)
-            NSLog("encryptedPassData: " + resultMap["encryptedPassData"]!!)
-            NSLog("activationData: " + resultMap["activationData"]!!)
-            NSLog("ephemeralPublicKey: " + resultMap["ephemeralPublicKey"]!!)
-
             handler(paymentPassRequest)
         })
     }
