@@ -110,7 +110,8 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
   }
     
     public func addPaymentPassViewController(_ controller: PKAddPaymentPassViewController, generateRequestWithCertificateChain certificates: [Data], nonce: Data, nonceSignature: Data, completionHandler handler: @escaping (PKAddPaymentPassRequest) -> Void) {
-        let map: [String: Any?] = ["certificatesBase64": certificates.map({ data in data.base64EncodedString()}), "nonceBase64": nonce.base64EncodedString(), "nonceSignatureBase64": nonceSignature.base64EncodedString()]
+        let map: [String: Any?] = ["certificatesBase64": certificates.map({ data in
+            NSData.init(data: data)}), "nonceBase64": NSData.init(data: nonce), "nonceSignatureBase64": NSData.init(data: nonceSignature)]
 
         channel.invokeMethod("onApplePayDataReceived", arguments: map, result: { result in
             let paymentPassRequest = PKAddPaymentPassRequest.init()
