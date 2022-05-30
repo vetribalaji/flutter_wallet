@@ -112,7 +112,7 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
     public func addPaymentPassViewController(_ controller: PKAddPaymentPassViewController, generateRequestWithCertificateChain certificates: [Data], nonce: Data, nonceSignature: Data, completionHandler handler: @escaping (PKAddPaymentPassRequest) -> Void) {
         NSLog("Apple Wallet data received.")
         
-        let map: [String: Any?] = ["certificatesBase64": certificates, "nonceBase64": nonce, "nonceSignatureBase64": nonceSignature]
+        let map: [String: Any?] = ["certificatesBase64": certificates.map({ e in e.base64EncodedString()}), "nonceBase64": nonce.base64EncodedString(), "nonceSignatureBase64": nonceSignature.base64EncodedString()]
 
         channel.invokeMethod("onApplePayDataReceived", arguments: map, result: { result in
             let paymentPassRequest = PKAddPaymentPassRequest.init()
@@ -121,9 +121,9 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
             }
 
             NSLog("Received payment pass data, sending back to Apple")
-            paymentPassRequest.encryptedPassData = resultMap["encryptedPassData"]??.data(using: String.Encoding.utf8)
+            paymentPassRequest.encryptedPassData = Data.init(base64Encoded: resultMap["encryptedPassData"]!!)
             paymentPassRequest.activationData = resultMap["activationData"]??.data(using: String.Encoding.utf8)
-            paymentPassRequest.ephemeralPublicKey = resultMap["ephemeralPublicKey"]??.data(using: String.Encoding.utf8)
+            paymentPassRequest.ephemeralPublicKey = Data.init(base64Encoded: resultMap["ephemeralPublicKey"]!!)
             NSLog("encryptedPassData: " + resultMap["encryptedPassData"]!!)
             NSLog("activationData: " + resultMap["activationData"]!!)
             NSLog("ephemeralPublicKey: " + resultMap["ephemeralPublicKey"]!!)
