@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
 class FlutterWallet {
@@ -77,8 +78,12 @@ class FlutterWallet {
         final String nonce = call.arguments["nonceBase64"].toString();
         final String nonceSignature = call.arguments["nonceSignatureBase64"].toString();
 
-        final req = await _applePayOnDataHandler!(certs, nonce, nonceSignature);
-        return <String, dynamic>{"encryptedPassData": req.encryptedPassData, "activationData": req.activationData, "ephemeralPublicKey": req.ephemeralPublicKey};
+        try {
+          final req = await _applePayOnDataHandler!(certs, nonce, nonceSignature);
+          return <String, dynamic>{"encryptedPassData": req.encryptedPassData, "activationData": req.activationData, "ephemeralPublicKey": req.ephemeralPublicKey};
+        } catch (e) {
+          return FlutterError("Failed while obtaining data from the third-party server: $e");
+        }
       }
     } else if (call.method == "onApplePayFinished") {}
 
