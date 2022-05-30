@@ -110,6 +110,14 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
   }
     
     public func addPaymentPassViewController(_ controller: PKAddPaymentPassViewController, generateRequestWithCertificateChain certificates: [Data], nonce: Data, nonceSignature: Data, completionHandler handler: @escaping (PKAddPaymentPassRequest) -> Void) {
+        NSLog("Apple Wallet data received")
+        NSLog("Nonce: ")
+        NSLog(String(data: nonce, encoding: .utf8)!)
+
+        NSLog("Nonce sign: ")
+        NSLog(String(data: nonceSignature, encoding: .utf8)!)
+        
+        
         let map: [String: Any?] = ["certificatesBase64": certificates.map({ data in
             String(data: data, encoding: .utf8)}), "nonceBase64": String(data: nonce, encoding: .utf8), "nonceSignatureBase64": String(data: nonceSignature, encoding: .utf8)]
 
