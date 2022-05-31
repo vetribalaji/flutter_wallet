@@ -130,7 +130,7 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
     
     public func addPaymentPassViewController(_ controller: PKAddPaymentPassViewController, didFinishAdding pass: PKPaymentPass?, error: Error?) {
         let passDict: [String: Any?] = [
-            "passActivationState": pass?.passActivationState,
+            "passActivationState": pass?.passActivationState.rawValue,
             "primaryAccountIdentifier": pass?.primaryAccountIdentifier,
             "primaryAccountNumberSuffix": pass?.primaryAccountNumberSuffix,
             "deviceAccountIdentifier": pass?.deviceAccountIdentifier,
