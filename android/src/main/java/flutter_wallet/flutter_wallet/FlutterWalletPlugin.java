@@ -59,10 +59,10 @@ public class FlutterWalletPlugin implements FlutterPlugin, MethodCallHandler, Ac
                     @Override
                     public void onComplete(@NonNull Task<List<TokenInfo>> task) {
                         if (task.isSuccessful()) {
-                            final List<TokenInfo> result = task.getResult();
-                            Log.d("FlutterWallet", "listTokens succeeded, found " + result.size() + " cards");
+                            final List<TokenInfo> taskInfoResult = task.getResult();
+                            Log.d("FlutterWallet", "listTokens succeeded, found " + taskInfoResult.size() + " cards");
                             final List<Map<String, Object>> tokens = new ArrayList<>();
-                            for (TokenInfo tokenInfo : result) {
+                            for (TokenInfo tokenInfo : taskInfoResult) {
                                 Map<String, Object> map = new HashMap<>();
                                 map.put("fpanLastFour", tokenInfo.getFpanLastFour());
                                 map.put("issuerName", tokenInfo.getIssuerName());
