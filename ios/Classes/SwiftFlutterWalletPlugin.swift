@@ -71,6 +71,7 @@ class PKAddPassButtonNativeView: NSObject, FlutterPlatformView {
 public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPassViewControllerDelegate {
   private var channel: FlutterMethodChannel!
   private var initiateAddPaymentPassFlowResult: FlutterResult?
+  private let pkPassLibrary = PKPassLibrary.init()
     
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "flutter_wallet_handler", binaryMessenger: registrar.messenger())
@@ -104,9 +105,22 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
           }
           
           return
+      } else if (call.method == "getAddedCards") {
+          let passes = pkPassLibrary.passes(of: PKPassType.secureElement)
+          let res: [[String: Any]] = passes.filter({ pass in pass.secureElementPass != nil }).map { pass -> [String: Any] in
+              let dict: [String: Any] = [
+                "fpanLastFour": pass.secureElementPass!.primaryAccountNumberSuffix,
+                "issuerName": pass.organizationName,
+                "network": "",
+                "isDefault": false
+              ]
+              return dict
+          }
+          
+          result(res)
       }
-      
-    return result(FlutterMethodNotImplemented)
+          
+      return result(FlutterMethodNotImplemented)
   }
     
     public func addPaymentPassViewController(_ controller: PKAddPaymentPassViewController, generateRequestWithCertificateChain certificates: [Data], nonce: Data, nonceSignature: Data, completionHandler handler: @escaping (PKAddPaymentPassRequest) -> Void) {

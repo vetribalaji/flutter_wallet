@@ -62,6 +62,11 @@ class FlutterWallet {
   static Future<String> getGooglePayWalletId() async => await _channel.invokeMethod('getGooglePayWalletId');
 
   static Future<String> getGooglePayStableHardwareId() async => await _channel.invokeMethod('getStableHardwareId');
+
+  static Future<List<AddedCard>> getAddedCards() async {
+    final List<Map<String, dynamic>>? addedCards = await _channel.invokeListMethod('getAddedCards');
+    return addedCards?.map((e) => AddedCard.fromJson(e)).toList() ?? [];
+  }
   
   factory FlutterWallet() => _instance;
 
@@ -128,4 +133,13 @@ class GoogleUserAddress {
 
 enum PaymentNetwork {
   amex, visa, masterCard, JCB, discover, electron, maestro
+}
+
+class AddedCard {
+  final String fpanLastFour, issuerName, network;
+  final bool isDefault;
+
+  const AddedCard(this.fpanLastFour, this.issuerName, this.network, this.isDefault);
+  
+  factory AddedCard.fromJson(Map<dynamic, dynamic> json) => AddedCard(json["fpanLastFour"], json["issuerName"], json["network"], json["isDefault"]);
 }
