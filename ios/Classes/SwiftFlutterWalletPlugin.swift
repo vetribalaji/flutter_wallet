@@ -107,6 +107,8 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
           return
       } else if (call.method == "getAddedCards") {
           let passes = pkPassLibrary.passes(of: PKPassType.secureElement)
+          NSLog("Passes queried, found " + String(passes.count) + " passes.")
+          
           let res: [[String: Any]] = passes.filter({ pass in pass.secureElementPass != nil }).map { pass -> [String: Any] in
               let dict: [String: Any] = [
                 "fpanLastFour": pass.secureElementPass!.primaryAccountNumberSuffix,
