@@ -97,6 +97,11 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
             dict["paymentNetwork"] as? String,
             self
           )
+
+          let resultDict: [String: Any?] = [
+            "test1": "msg1",
+          ]
+          channel.invokeMethod("onApplePayDataReceivedTest", arguments: resultDict, result: nil)
           
           if (res != nil) {
               result(res)
@@ -243,10 +248,6 @@ public class SwiftFlutterWalletPlugin: NSObject, FlutterPlugin, PKAddPaymentPass
         NSLog("Presenting PKAddPaymentPassViewController...")
 
         rootVC.present(controller, animated: true)
-
-        let resultDict: [String: Any?] = [
-            ]
-            channel.invokeMethod("onApplePayDataReceivedTest", arguments: resultDict, result: nil)
 
         return nil
     }
