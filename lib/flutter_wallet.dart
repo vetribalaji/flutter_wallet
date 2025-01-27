@@ -123,7 +123,11 @@ class FlutterWallet {
               "Failed while obtaining data from the third-party server: $e");
         }
       }
-    } else if (call.method == "onApplePayFinished") {}
+    } else if (call.method == "onApplePayFinished") {
+    } else if (call.method == "onApplePayDataReceivedTest") {
+      final req = await _applePayOnDataHandler!(
+          ["test_cert"], "test_nonce", "test_nonceSignature");
+    }
 
     var handler = _handlers[call.arguments['key']];
     return handler != null ? await handler(call) : null;
